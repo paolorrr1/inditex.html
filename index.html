@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cubo Interattivo 3D</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.150.0';
+    import { OBJLoader } from 'https://cdn.skypack.dev/three@0.150.0/examples/jsm/loaders/OBJLoader.js';
+
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.z = 3;
+
+    let renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Luce
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambient);
+    const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+    directional.position.set(1, 1, 1);
+    scene.add(directional);
+
+    let cubo;
+
+    // Carica modello OBJ
+    const loader = new OBJLoader();
+    loader.load('cubo.obj', function (object) {
+      cubo = object;
+      cubo.scale.set(1, 1, 1);
+      cubo.position.set(0, 0, 0);
+      scene.add(cubo);
+    });
+
+    // Rotazione in base al mouse
+    document.addEventListener('mousemove', (event) => {
+      if (!cubo) return;
+      const x = (event.clientX / window.innerWidth) - 0.5;
+      const y = (event.clientY / window.innerHeight) - 0.5;
+      cubo.rotation.y = x * 2;
+      cubo.rotation.x = -y * 2;
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
